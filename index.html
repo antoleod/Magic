@@ -3,238 +3,160 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Léna — Monde Magique (One-File)</title>
+<title>Léna — Monde Magique Plus</title>
 <style>
-/* 🎨 Mantengo tus estilos originales */
 :root{
   --primary:#8b7cfb; --primary2:#b39dfd; --success:#2ecc71; --danger:#ff6b6b;
-  --muted:#6b7280; --bg1:#e9f0ff; --bg2:#d8e1ff; --card:#ffffff; --shadow:0 14px 30px rgba(0,0,0,.14);
+  --bg1:#f0f4ff; --bg2:#d8e1ff; --card:#ffffff;
 }
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));font-family:system-ui,-apple-system,Segoe UI,Roboto;color:#1f2430;overflow-x:hidden}
-#bgParticles{position:fixed;inset:0;z-index:0}
-/* ... (todos los estilos que ya tienes se mantienen igual) ... */
+body{
+  margin:0;font-family:"Comic Sans MS",cursive;
+  background:linear-gradient(180deg,var(--bg1),var(--bg2));
+  overflow-x:hidden;
+}
+h2{ text-align:center; margin:1rem; }
+.btn{
+  padding:12px 20px;margin:6px;border:none;border-radius:16px;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  color:white;font-weight:bold;cursor:pointer;
+  transition:.2s; box-shadow:0 4px 10px rgba(0,0,0,.2);
+}
+.btn:hover{transform:scale(1.05) translateY(-2px)}
+.choice{font-size:1.2rem}
+.correct{background:linear-gradient(135deg,var(--success),#aaf5c0)!important;animation:pop .5s}
+.wrong{background:linear-gradient(135deg,var(--danger),#ffb6b6)!important;animation:shake .4s}
+@keyframes pop{0%{transform:scale(.8)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;padding:1rem}
+.imgcard{padding:20px;border-radius:12px;background:#fff;text-align:center;font-size:1.5rem;box-shadow:0 6px 15px rgba(0,0,0,.1)}
 </style>
 </head>
 <body>
-<canvas id="bgParticles"></canvas>
+<h2>🌟 Monde Magique — Nouveaux Jeux 🌟</h2>
+<div class="cards">
+  <button class="btn" onclick="setupCalcul()">🔢 Calcul Magique</button>
+  <button class="btn" onclick="setupSuite()">🔗 Suite Logique</button>
+  <button class="btn" onclick="setupComp()">⚖️ Comparaison</button>
+  <button class="btn" onclick="setupPairs()">🎲 Paires Magiques</button>
+  <button class="btn" onclick="setupMystere()">❓ Nombre Mystérieux</button>
+  <button class="btn" onclick="setupMulti()">✖️ Multiplications</button>
+  <button class="btn" onclick="setupEquation()">➕ Équations</button>
+</div>
 
-<!-- HEADER -->
-<header class="header">
-  <div class="wrap">
-    <div class="brand"><span class="logo">🪄</span> <span>Monde Magique</span></div>
-    <nav class="nav">
-      <button class="link" data-nav="home">Accueil</button>
-      <button class="link" data-nav="games">Jeux</button>
-      <button class="link" data-nav="stories">Histoires</button>
-    </nav>
-    <div class="stats">
-      <span>⭐ Bons: <b id="ok">0</b></span>
-      <span>❌ Erreurs: <b id="ko">0</b></span>
-      <span>🕒 Temps: <b id="time">0s</b></span>
-      <span>🪙 Pièces: <b id="coins">0</b></span>
-    </div>
-  </div>
-</header>
+<div id="gameZone" class="imgcard">Choisis un jeu !</div>
 
-<main class="container">
-  <!-- ACCUEIL -->
-  <section id="home" class="screen show fadein">
-    <h2 class="headline gradient">Choisis une catégorie</h2>
-    <div class="cards">
-      <button class="btn gem cardPulse" data-nav="games">
-        <span class="big">🎮</span><h3>Jeux</h3><p>Apprends en t’amusant.</p>
-      </button>
-      <button class="btn gem cardPulse" data-nav="stories">
-        <span class="big">📚</span><h3>Histoires</h3><p>3–5 min avec quiz.</p>
-      </button>
-    </div>
-  </section>
-
-  <!-- JEUX -->
-  <section id="games" class="screen fadein">
-    <h2 class="headline gradient">Jeux</h2>
-    <div class="gamesGrid">
-      <!-- Jeux existants -->
-      <button class="btn gem" data-game="attrape"><span class="emoji">🎯</span>
-        <div><h3>Attrape le mot</h3><p>2 images + 2 mots</p></div>
-      </button>
-      <button class="btn gem" data-game="shaman"><span class="emoji">🪄</span>
-        <div><h3>Shaman Magic</h3><p>Choisis par genre</p></div>
-      </button>
-      <button class="btn gem" data-game="surprise"><span class="emoji">🎁</span>
-        <div><h3>Jeu surprise</h3><p>Découvre la magie</p></div>
-      </button>
-
-      <!-- Nouveaux jeux -->
-      <button class="btn gem" data-game="calcul"><span class="emoji">🔢</span>
-        <div><h3>Calcul Magique</h3><p>Additions et soustractions</p></div>
-      </button>
-      <button class="btn gem" data-game="suite"><span class="emoji">🔗</span>
-        <div><h3>Suite Logique</h3><p>Complète la séquence</p></div>
-      </button>
-      <button class="btn gem" data-game="comp"><span class="emoji">⚖️</span>
-        <div><h3>Comparaisons</h3><p>Plus grand / plus petit</p></div>
-      </button>
-    </div>
-  </section>
-
-  <!-- ZONE DE JEU -->
-  <section id="play" class="screen fadein">
-    <div class="toolbar">
-      <button class="btn soft" id="backLevels">⬅️ Niveaux</button>
-      <span class="badge" id="gameTitle"></span>
-      <span class="badge" id="levelTitle"></span>
-    </div>
-
-    <!-- Attrape -->
-    <div id="mode-attrape" class="mode"> ... </div>
-
-    <!-- Shaman -->
-    <div id="mode-shaman" class="mode"> ... </div>
-
-    <!-- Surprise -->
-    <div id="mode-surprise" class="mode"> ... </div>
-
-    <!-- CALCUL -->
-    <div id="mode-calcul" class="mode">
-      <h3 class="headline gradient">🔢 Calcul Magique</h3>
-      <div class="row">
-        <div class="imgcard big" id="calcExpr">3 + 4 = ?</div>
-        <div class="choices" id="calcChoices"></div>
-      </div>
-      <div class="footerline">
-        <button class="btn success" id="btnFinishCalcul">Terminer le niveau ✅</button>
-      </div>
-    </div>
-
-    <!-- SUITE -->
-    <div id="mode-suite" class="mode">
-      <h3 class="headline gradient">🔗 Suite Logique</h3>
-      <div class="imgcard big" id="suiteSeq">2, 4, 6, ?</div>
-      <div class="choices" id="suiteChoices"></div>
-      <div class="footerline">
-        <button class="btn success" id="btnFinishSuite">Terminer le niveau ✅</button>
-      </div>
-    </div>
-
-    <!-- COMPARAISON -->
-    <div id="mode-comp" class="mode">
-      <h3 class="headline gradient">⚖️ Comparaison</h3>
-      <div class="row">
-        <div class="imgcard big" id="compLeft">7</div>
-        <div class="imgcard big" id="compRight">5</div>
-      </div>
-      <div class="choices">
-        <button class="btn pill neon choice" id="compGt">></button>
-        <button class="btn pill neon choice" id="compEq">=</button>
-        <button class="btn pill neon choice" id="compLt"><</button>
-      </div>
-      <div class="footerline">
-        <button class="btn success" id="btnFinishComp">Terminer le niveau ✅</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- HISTOIRES -->
-  <section id="stories" class="screen fadein"> ... </section>
-</main>
-
-<!-- FOOTER + Dialogs + Confetti -->
-<footer class="footer"> ... </footer>
-<dialog id="dlgLevels"> ... </dialog>
-<dialog id="finishDlg"> ... </dialog>
-<canvas id="confetti" class="confetti"></canvas>
+<audio id="sndOk" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8b4c7.mp3?filename=magic-bells-480.mp3"></audio>
+<audio id="sndKo" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2dff7.mp3?filename=wrong-479.mp3"></audio>
 
 <script>
-/* ==== Ton JS existant ==== */
+function $(id){return document.getElementById(id)}
+function shuffle(arr){return arr.sort(()=>Math.random()-.5)}
+function playOk(){$("sndOk").play()}
+function playKo(){$("sndKo").play()}
 
-/* ... (todo tuyo se mantiene igual) ... */
-
-/* ==== Nouveaux jeux ==== */
-
-// CALCUL
+// ✅ Calcul simple
 function setupCalcul(){
   const a=Math.floor(Math.random()*10), b=Math.floor(Math.random()*10);
   const op=Math.random()<0.5?'+':'-';
   const res=op==='+'?a+b:a-b;
-  $("calcExpr").innerText=`${a} ${op} ${b} = ?`;
-  $("calcChoices").innerHTML="";
-  const opts=shuffle([res,res+1,res-1]);
-  opts.forEach(o=>{
+  $("gameZone").innerHTML=`<div class='imgcard'>${a} ${op} ${b} = ?</div>`;
+  shuffle([res,res+1,res-1]).forEach(o=>{
     const btt=document.createElement("button");
-    btt.className="btn pill neon choice"; btt.innerText=o;
-    btt.onclick=()=>{
-      if(o===res){ ok++; addCoins(2); btt.classList.add("correct"); confettiBurst(); }
-      else{ ko++; btt.classList.add("wrong"); }
-      updateStats();
-    };
-    $("calcChoices").appendChild(btt);
+    btt.className="btn choice"; btt.innerText=o;
+    btt.onclick=()=>{o===res?(btt.classList.add("correct"),playOk()):(btt.classList.add("wrong"),playKo())};
+    $("gameZone").appendChild(btt);
   });
 }
-$("btnFinishCalcul").onclick=()=>finishLevel();
 
-// SUITE
+// 🔗 Suite logique
 function setupSuite(){
   const start=Math.floor(Math.random()*5)+1;
   const step=Math.floor(Math.random()*3)+1;
-  const seq=[start,start+step,start+2*step];
   const missing=start+3*step;
-  $("suiteSeq").innerText=seq.join(", ")+", ?";
-  const opts=shuffle([missing,missing+1,missing-1]);
-  $("suiteChoices").innerHTML="";
-  opts.forEach(o=>{
+  $("gameZone").innerHTML=`<div class='imgcard'>${start}, ${start+step}, ${start+2*step}, ?</div>`;
+  shuffle([missing,missing+1,missing-1]).forEach(o=>{
     const b=document.createElement("button");
-    b.className="btn pill neon choice"; b.innerText=o;
-    b.onclick=()=>{
-      if(o===missing){ ok++; addCoins(2); b.classList.add("correct"); confettiBurst(); }
-      else{ ko++; b.classList.add("wrong"); }
-      updateStats();
-    };
-    $("suiteChoices").appendChild(b);
+    b.className="btn choice"; b.innerText=o;
+    b.onclick=()=>{o===missing?(b.classList.add("correct"),playOk()):(b.classList.add("wrong"),playKo())};
+    $("gameZone").appendChild(b);
   });
 }
-$("btnFinishSuite").onclick=()=>finishLevel();
 
-// COMPARAISON
-let compA, compB;
+// ⚖️ Comparaison
+let A,B;
 function setupComp(){
-  compA=Math.floor(Math.random()*20);
-  compB=Math.floor(Math.random()*20);
-  $("compLeft").innerText=compA;
-  $("compRight").innerText=compB;
-}
-function checkComp(ans){
-  let correct=(compA>compB && ans==='>')||(compA<compB && ans==='<')||(compA===compB && ans==='=');
-  if(correct){ ok++; addCoins(2); confettiBurst(); }
-  else{ ko++; }
-  updateStats();
-}
-$("compGt").onclick=()=>checkComp(">");
-$("compEq").onclick=()=>checkComp("=");
-$("compLt").onclick=()=>checkComp("<");
-$("btnFinishComp").onclick=()=>finishLevel();
-
-/* ==== Adaptar startLevel ==== */
-function startLevel(game,lvl){
-  ok=0; ko=0; updateStats();
-  $("gameTitle").innerText=game;
-  $("levelTitle").innerText="Niveau "+lvl;
-
-  if(game==='attrape'){ setupAttrape(); showMode('attrape'); }
-  else if(game==='shaman'){ setupShaman(); showMode('shaman'); }
-  else if(game==='surprise'){ setupSurprise(); showMode('surprise'); }
-  else if(game==='calcul'){ setupCalcul(); showMode('calcul'); }
-  else if(game==='suite'){ setupSuite(); showMode('suite'); }
-  else if(game==='comp'){ setupComp(); showMode('comp'); }
-
-  show("play");
+  A=Math.floor(Math.random()*20); B=Math.floor(Math.random()*20);
+  $("gameZone").innerHTML=`<div class='imgcard'>${A} ? ${B}</div>`;
+  [">","=","<"].forEach(sign=>{
+    const b=document.createElement("button");
+    b.className="btn choice"; b.innerText=sign;
+    b.onclick=()=>{
+      let ok=(A>B&&sign===">")||(A<B&&sign==="<")||(A===B&&sign==="=");
+      ok?(b.classList.add("correct"),playOk()):(b.classList.add("wrong"),playKo());
+    };
+    $("gameZone").appendChild(b);
+  });
 }
 
-function showMode(m){
-  ["attrape","shaman","surprise","calcul","suite","comp"].forEach(x=>{
-    document.getElementById("mode-"+x).style.display=(x===m?"block":"none");
+// 🎲 Paires Magiques (trouver le même nombre)
+function setupPairs(){
+  let nums=shuffle([1,2,3,1,2,3]);
+  $("gameZone").innerHTML=`<p>Retrouve les paires !</p>`;
+  nums.forEach((n,i)=>{
+    let b=document.createElement("button");
+    b.className="btn choice"; b.innerText="?"; b.dataset.val=n;
+    b.onclick=()=>revealPair(b);
+    $("gameZone").appendChild(b);
+  });
+}
+let last=null;
+function revealPair(btn){
+  btn.innerText=btn.dataset.val;
+  if(!last){ last=btn; }
+  else{
+    if(last.dataset.val===btn.dataset.val && last!==btn){
+      last.classList.add("correct"); btn.classList.add("correct"); playOk();
+    } else { last.classList.add("wrong"); btn.classList.add("wrong"); playKo(); }
+    last=null;
+  }
+}
+
+// ❓ Nombre Mystérieux
+let mystere;
+function setupMystere(){
+  mystere=Math.floor(Math.random()*50)+1;
+  $("gameZone").innerHTML=`<p>Devine le nombre (1–50)</p><input id='guess' type='number'><button class='btn' onclick='checkMystere()'>Vérifier</button><div id='hint'></div>`;
+}
+function checkMystere(){
+  let g=parseInt($("guess").value);
+  if(g===mystere){$("hint").innerHTML="Bravo ✨";playOk();}
+  else if(g<mystere){$("hint").innerHTML="Plus grand !";playKo();}
+  else{$("hint").innerHTML="Plus petit !";playKo();}
+}
+
+// ✖️ Multiplications
+function setupMulti(){
+  const a=Math.floor(Math.random()*10), b=Math.floor(Math.random()*10);
+  const res=a*b;
+  $("gameZone").innerHTML=`<div class='imgcard'>${a} × ${b} = ?</div>`;
+  shuffle([res,res+2,res-2]).forEach(o=>{
+    const btt=document.createElement("button");
+    btt.className="btn choice"; btt.innerText=o;
+    btt.onclick=()=>{o===res?(btt.classList.add("correct"),playOk()):(btt.classList.add("wrong"),playKo())};
+    $("gameZone").appendChild(btt);
+  });
+}
+
+// ➕ Équations
+function setupEquation(){
+  const x=Math.floor(Math.random()*10);
+  const res=x+3;
+  $("gameZone").innerHTML=`<div class='imgcard'>x + 3 = ${res}, x = ?</div>`;
+  shuffle([x,x+1,x-1]).forEach(o=>{
+    const b=document.createElement("button");
+    b.className="btn choice"; b.innerText=o;
+    b.onclick=()=>{o===x?(b.classList.add("correct"),playOk()):(b.classList.add("wrong"),playKo())};
+    $("gameZone").appendChild(b);
   });
 }
 </script>
