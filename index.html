@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Léna — Jeux de Genre</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>✨ Genre Magique</h1>
+    <div class="stats">
+      <span>⭐ Aciertos: <b id="ok">0</b></span>
+      <span>❌ Errores: <b id="ko">0</b></span>
+      <span>🕒 Tiempo: <b id="time">0s</b></span>
+      <span>🪙 Monedas: <b id="coins">0</b></span>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="modes">
+      <button class="tab active" data-mode="attrape">🎯 Attrape le Mot</button>
+      <button class="tab" data-mode="shaman">🪄 Shaman Magic</button>
+      <div class="right">
+        <label>Niveau:
+          <select id="level"></select>
+        </label>
+        <button id="btnReset" class="ghost">Reiniciar</button>
+      </div>
+    </nav>
+
+    <!-- ATTRAPE LE MOT -->
+    <section id="screen-attrape" class="screen show">
+      <div class="row">
+        <div class="images">
+          <div class="imgcard" id="imgA"><span>🪸</span><p>—</p></div>
+          <div class="imgcard" id="imgB"><span>🐸</span><p>—</p></div>
+        </div>
+        <div class="choices">
+          <button class="choice" id="opt1">mot 1</button>
+          <button class="choice" id="opt2">mot 2</button>
+          <div class="controls">
+            <button id="btnHear" class="pill">🔊 Écouter</button>
+            <button id="btnRecord" class="pill">🎙️ Grabar (adulto)</button>
+            <button id="btnPlayRec" class="pill">▶️ Reproducir grabación</button>
+            <button id="btnNext" class="primary">Suivant ⏭️</button>
+          </div>
+          <div class="hint" id="hintAttrape"></div>
+        </div>
+      </div>
+      <div class="footerline">
+        <span id="seriesTxt">Série 1 / 6</span>
+        <button id="btnStory" class="ghost">📖 Cuento loco</button>
+      </div>
+    </section>
+
+    <!-- SHAMAN MAGIC -->
+    <section id="screen-shaman" class="screen">
+      <div class="goalbar">
+        <span id="goalText">Sélectionne uniquement les mots masculins</span>
+        <div class="progress"><i id="bar"></i></div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="footerline">
+        <button id="btnPrevBoard" class="ghost">⬅️ Femenin</button>
+        <button id="btnNextBoard" class="primary">Masculin ➡️</button>
+        <button id="btnReview" class="ghost">📘 Repasar errores</button>
+      </div>
+      <div class="hint" id="hintShaman"></div>
+    </section>
+
+    <!-- Modal cuento -->
+    <dialog id="storyDlg">
+      <h3>📖 Tu cuento loco</h3>
+      <div id="storyText" class="story"></div>
+      <div class="dialogBtns">
+        <button id="btnPlayStory" class="pill">🔊 Escuchar</button>
+        <button id="btnCloseStory" class="primary">OK</button>
+      </div>
+    </dialog>
+
+    <!-- Confetti canvas -->
+    <canvas id="confetti" class="confetti"></canvas>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
