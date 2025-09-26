@@ -1,1 +1,421 @@
-<!doctype html><html><head><meta charset='utf-8'><title>Monde Magique v4</title></head><body><h1>Monde Magique v4</h1><p>Placeholder index.html</p><script src='app.js'></script></body></html>
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Léna — Monde Magique (One-File)</title>
+<style>
+:root{
+  --primary:#8b7cfb; --primary2:#b39dfd; --success:#2ecc71; --danger:#ff6b6b;
+  --muted:#6b7280; --bg1:#e9f0ff; --bg2:#d8e1ff; --card:#ffffff; --shadow:0 14px 30px rgba(0,0,0,.14);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));font-family:system-ui,-apple-system,Segoe UI,Roboto;color:#1f2430;overflow-x:hidden}
+#bgParticles{position:fixed;inset:0;z-index:0}
+.glass{background:rgba(255,255,255,.7);backdrop-filter:blur(8px)}
+.topbar{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid #e6e6f2}
+.topbar h1{margin:0;font-weight:900;letter-spacing:.3px}
+.stats{display:flex;gap:14px;font-weight:800}
+.container{position:relative;z-index:1;max-width:1100px;margin:20px auto;padding:0 16px}
+.screen{display:none;border-radius:24px;box-shadow:var(--shadow);padding:16px;transform-origin:50% 50%}
+.screen.show{display:block}
+.fadein{animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
+.headline{font-weight:900;font-size:22px}
+.gradient{background:linear-gradient(90deg,#5e4df7,#c49dff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.catGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.btn{font-weight:900;border:0;cursor:pointer}
+.gem{border-radius:20px;padding:18px;background:radial-gradient(circle at 30% 20%, #fff, #f7f4ff);box-shadow:0 10px 24px rgba(0,0,0,.12);position:relative;overflow:hidden;transition:transform .15s}
+.gem::after{content:'';position:absolute;inset:-2px;border-radius:inherit;padding:2px;background:conic-gradient(from 0deg, #fff0, #b39dfd55, #fff0, #8b7cfb55, #fff0);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin 4s linear infinite}
+@keyframes spin{to{transform:rotate(1turn)}}
+.gem:hover{transform:translateY(-4px)}
+.cardPulse{animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%{box-shadow:0 10px 24px rgba(0,0,0,.12)}50%{box-shadow:0 16px 40px rgba(139,124,251,.35)}100%{box-shadow:0 10px 24px rgba(0,0,0,.12)}}
+.big{font-size:48px;display:block}
+.gamesGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:12px}
+.emoji{font-size:40px}
+.levels{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.levelbtn{padding:16px;border-radius:14px;border:2px solid #dde3ff;background:#fff;cursor:pointer;font-weight:900;transition:transform .12s, box-shadow .2s}
+.levelbtn:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(0,0,0,.12)}
+.levelbtn.done{background:#e9fbef;border-color:#b5f0c9;color:#0f5132;box-shadow:inset 0 0 0 2px #34c759}
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.badge{background:#eef3ff;border:1px solid #d9e2ff;border-radius:999px;padding:6px 12px;font-weight:800}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.images{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.imgcard{background:#f8fbff;border:3px solid #dfe7ff;border-radius:18px;padding:14px;min-height:180px;text-align:center;position:relative;overflow:hidden}
+.imgcard span{font-size:64px}
+.float{animation:levitate 2.5s ease-in-out infinite}
+@keyframes levitate{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+.pill{border-radius:999px;padding:14px 18px;background:#fff;box-shadow:0 10px 20px rgba(0,0,0,.12);transition:transform .08s, box-shadow .15s}
+.pill:active{transform:translateY(2px)}
+.primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border-radius:14px;padding:12px 18px;box-shadow:0 10px 24px rgba(139,124,251,.35)}
+.success{background:linear-gradient(135deg,#2ecc71,#5de39a);color:#fff;border-radius:14px;padding:12px 18px;box-shadow:0 10px 24px rgba(46,204,113,.35)}
+.soft{background:#fff;border:2px solid #e4e8ff;border-radius:12px;padding:10px 14px}
+.neon{position:relative}
+.neon::before{content:'';position:absolute;inset:-2px;border-radius:inherit;background:linear-gradient(90deg,#9b8bff,#8bf0ff,#ff8bd9);filter:blur(8px);opacity:.35;z-index:-1}
+.choice{font-size:20px;margin:6px 0}
+.choice.correct{outline:4px solid var(--success)}
+.choice.wrong{outline:4px solid var(--danger);animation:shake .35s ease}
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+.hint{margin-top:6px;font-size:14px;color:var(--muted)}
+.footerline{margin-top:8px;display:flex;align-items:center;justify-content:space-between}
+.goalbar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.potion{height:16px;background:#e7ebff;border-radius:999px;overflow:hidden;flex:1;position:relative}
+.potion i{display:block;height:100%;width:0;background:linear-gradient(90deg,#6aa9ff,#8bc34a);box-shadow:0 0 18px 6px rgba(138,204,101,.25) inset}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.cell{background:#fff;border:2px solid #dfe7ff;border-radius:14px;padding:10px;text-align:center;font-weight:800;cursor:pointer;min-height:54px;display:flex;align-items:center;justify-content:center;transition:transform .08s}
+.cell:active{transform:scale(.98)}
+.cell.good{outline:3px solid var(--success)}
+.cell.bad{outline:3px solid var(--danger)}
+.surprise{display:flex;flex-direction:column;gap:10px;align-items:center}
+.surGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.surOpt{font-size:48px;border-radius:16px;border:2px solid #e4e8ff;background:#fff;padding:8px 12px;cursor:pointer}
+.storyBox{margin-top:14px;background:#fff;border:2px solid #e4e8ff;border-radius:16px;padding:12px;display:none}
+.typewriter{min-height:120px;white-space:pre-wrap}
+dialog{border:0;border-radius:16px;box-shadow:var(--shadow);padding:16px}
+.stars{display:flex;gap:8px;justify-content:center;margin:8px 0}
+.star{width:36px;height:36px;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);background:#ffd166;filter:drop-shadow(0 6px 10px rgba(0,0,0,.15))}
+.star.off{background:#e6e6e6}
+.chest{position:relative;width:160px;height:120px;margin:10px auto}
+.chest .box{position:absolute;bottom:0;left:0;right:0;height:80px;background:#d08b43;border:4px solid #9a5d20;border-bottom-left-radius:10px;border-bottom-right-radius:10px}
+.chest .lid{position:absolute;top:0;left:0;right:0;height:60px;background:#c27a38;border:4px solid #9a5d20;border-top-left-radius:10px;border-top-right-radius:10px;transform-origin:left bottom}
+.chest.open .lid{animation:openLid .7s ease forwards}
+@keyframes openLid{to{transform:rotateX(55deg)}}
+.chest .shine{position:absolute;top:34px;left:10px;right:10px;height:18px;background:radial-gradient(circle,#fff8,transparent);opacity:0}
+.chest.open .shine{animation:shine .9s ease .5s forwards}
+@keyframes shine{to{opacity:1}}
+.confetti{position:fixed;inset:0;pointer-events:none}
+@media (max-width:920px){.row{grid-template-columns:1fr}.levels{grid-template-columns:repeat(3,minmax(0,1fr))}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<canvas id="bgParticles"></canvas>
+
+<header class="topbar glass">
+  <h1>✨ Monde Magique</h1>
+  <div class="stats">
+    <span>⭐ Aciertos: <b id="ok">0</b></span>
+    <span>❌ Errores: <b id="ko">0</b></span>
+    <span>🕒 Tiempo: <b id="time">0s</b></span>
+    <span>🪙 Monedas: <b id="coins">0</b></span>
+  </div>
+</header>
+
+<main class="container">
+  <!-- HOME -->
+  <section id="home" class="screen show fadein glass">
+    <h2 class="headline gradient">Elige una categoría</h2>
+    <div class="catGrid">
+      <button class="btn gem cardPulse" data-nav="games">
+        <span class="big">🎮</span><h3>Juegos</h3><p>Aprende con magia y sorpresas.</p>
+      </button>
+      <button class="btn gem cardPulse" data-nav="stories">
+        <span class="big">📚</span><h3>Cuentos mágicos</h3><p>Historias de 3–5 min con tus palabras.</p>
+      </button>
+    </div>
+  </section>
+
+  <!-- GAMES MENU -->
+  <section id="games" class="screen fadein glass">
+    <div class="toolbar">
+      <button class="btn soft" data-nav="home">⬅️ Inicio</button>
+      <h2 class="headline gradient">Juegos</h2>
+    </div>
+    <div class="gamesGrid">
+      <button class="btn gem" data-game="attrape"><span class="emoji">🎯</span>
+        <div><h3>Attrape le Mot</h3><p>2 imágenes + 2 palabras</p></div>
+      </button>
+      <button class="btn gem" data-game="shaman"><span class="emoji">🪄</span>
+        <div><h3>Shaman Magic</h3><p>Selecciona por género</p></div>
+      </button>
+      <button class="btn gem" data-game="surprise"><span class="emoji">🎁</span>
+        <div><h3>Juego sorpresa</h3><p>¡Descúbrelo!</p></div>
+      </button>
+    </div>
+    <h3 class="headline">Niveles</h3>
+    <div id="levels" class="levels"></div>
+  </section>
+
+  <!-- PLAY -->
+  <section id="play" class="screen fadein glass">
+    <div class="toolbar">
+      <button class="btn soft" id="backLevels">⬅️ Niveles</button>
+      <span class="badge" id="gameTitle"></span>
+      <span class="badge" id="levelTitle"></span>
+    </div>
+
+    <!-- Attrape -->
+    <div id="mode-attrape" class="mode">
+      <div class="row">
+        <div class="images">
+          <div class="imgcard float" id="imgA"><span>🪸</span><p>—</p></div>
+          <div class="imgcard float" id="imgB"><span>🐸</span><p>—</p></div>
+        </div>
+        <div class="choices">
+          <button class="btn pill neon choice" id="opt1">mot 1</button>
+          <button class="btn pill neon choice" id="opt2">mot 2</button>
+          <div class="controls">
+            <button class="btn soft" id="btnHear">🔊 Écouter</button>
+            <button class="btn primary" id="btnNext">Suivant ⏭️</button>
+          </div>
+          <div class="hint" id="hintAttrape"></div>
+        </div>
+      </div>
+      <div class="footerline">
+        <span id="seriesTxt">Série 1 / 1</span>
+        <button class="btn success" id="btnFinishAttrape">Terminar nivel ✅</button>
+      </div>
+    </div>
+
+    <!-- Shaman -->
+    <div id="mode-shaman" class="mode">
+      <div class="goalbar">
+        <span id="goalText">Sélectionne uniquement les mots masculins</span>
+        <div class="potion"><i id="bar"></i></div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="footerline">
+        <button class="btn success" id="btnFinishShaman">Terminar nivel ✅</button>
+      </div>
+      <div class="hint" id="hintShaman"></div>
+    </div>
+
+    <!-- Sorpresa -->
+    <div id="mode-surprise" class="mode">
+      <h3 class="headline gradient">🎁 Adivina por sonido</h3>
+      <p>Escucha la pista y elige el emoji correcto.</p>
+      <div class="surprise">
+        <button class="btn soft" id="btnPlayClue">🔊 Reproducir pista</button>
+        <div class="surGrid">
+          <button class="surOpt" id="sur1">🍜</button>
+          <button class="surOpt" id="sur2">🐸</button>
+        </div>
+        <div class="hint" id="hintSur"></div>
+        <div class="footerline">
+          <button class="btn success" id="btnFinishSur">Terminar nivel ✅</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORIES -->
+  <section id="stories" class="screen fadein glass">
+    <div class="toolbar">
+      <button class="btn soft" data-nav="home">⬅️ Inicio</button>
+      <h2 class="headline gradient">Cuentos mágicos</h2>
+    </div>
+    <div class="levels" id="storyList"></div>
+    <article class="storyBox" id="storyBox">
+      <h3 id="storyTitle">—</h3>
+      <div id="storyText" class="typewriter"></div>
+      <div class="storyBtns">
+        <button class="btn soft" id="btnStoryPlay">🔊 Escuchar</button>
+        <button class="btn primary" id="btnStoryNew">🔄 Nuevo cuento</button>
+      </div>
+    </article>
+  </section>
+
+  <!-- Fin de nivel -->
+  <dialog id="finishDlg" class="glass">
+    <h3 class="headline gradient">🎉 ¡Nivel completado!</h3>
+    <div class="stars" id="stars"></div>
+    <div class="chest" id="chest"><div class="lid"></div><div class="box"></div><div class="shine"></div></div>
+    <p id="finishMsg">¡Has ganado monedas!</p>
+    <div class="dialogBtns"><button class="btn primary" id="btnGoLevels">Volver a niveles</button></div>
+  </dialog>
+
+  <canvas id="confetti" class="confetti"></canvas>
+</main>
+
+<script>
+/* ------------ Datos base ------------- */
+const WORDS = [
+  { w:"grenouille", g:"f", e:"🐸", rule:"-ouille → féminin" },
+  { w:"corail", g:"m", e:"🪸", rule:"-ail → masculin" },
+  { w:"éventail", g:"m", e:"🪭", rule:"-ail → masculin" },
+  { w:"muraille", g:"f", e:"🧱", rule:"-aille → féminin" },
+  { w:"paille", g:"f", e:"🥤", rule:"-aille → féminin" },
+  { w:"nouille", g:"f", e:"🍜", rule:"-ouille → féminin" },
+  { w:"portail", g:"m", e:"🚪", rule:"-ail → masculin" },
+  { w:"citrouille", g:"f", e:"🎃", rule:"-ouille → féminin" },
+  { w:"bataille", g:"f", e:"⚔️", rule:"-aille → féminin" },
+  { w:"ratatouille", g:"f", e:"🥘", rule:"-ouille → féminin" },
+  { w:"écaille", g:"f", e:"🐟", rule:"-aille → féminin" },
+  { w:"épouvantail", g:"m", e:"🌾", rule:"-ail → masculin" },
+  { w:"fenouil", g:"m", e:"🥬", rule:"-ouil → masculin (souvent)" },
+  { w:"rail", g:"m", e:"🛤️", rule:"-ail → masculin" },
+  { w:"travail", g:"m", e:"💼", rule:"-ail → masculin" },
+  { w:"médaille", g:"f", e:"🥇", rule:"-aille → féminin" },
+];
+
+/* ------------ Estado / helpers ------------- */
+const STORE = { coinsKey:'lena.coins', progressKey:'lena.progress.onefile' };
+let coins = +(localStorage.getItem(STORE.coinsKey) || 0);
+let ok=0, ko=0, timerInt=null, startedAt=Date.now();
+const $=id=>document.getElementById(id);
+const views={home:$('home'),games:$('games'),play:$('play'),stories:$('stories')};
+const stats={ok:$('ok'),ko:$('ko'),time:$('time'),coins:$('coins')};
+stats.coins.innerText=coins;
+function updateStats(){ stats.ok.innerText=ok; stats.ko.innerText=ko; stats.coins.innerText=coins; }
+function addCoins(n){ coins+=n; localStorage.setItem(STORE.coinsKey, coins); updateStats(); }
+function startTimer(){ if(timerInt) clearInterval(timerInt); startedAt=Date.now(); timerInt=setInterval(()=>{ stats.time.innerText=Math.floor((Date.now()-startedAt)/1000)+'s'; },250); }
+function shuffle(a){ return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]); }
+function speak(t){ try{ const u=new SpeechSynthesisUtterance(t); u.lang='fr-FR'; u.rate=.95; speechSynthesis.cancel(); speechSynthesis.speak(u);}catch(e){} }
+function articleOf(w){ const v=/^[aeiouyâêîôûéèëïüœ]/i.test(w.w); return (w.g==='m'?(v?"l’":"le"):(v?"l’":"la")); }
+function loadProgress(){ try{ return JSON.parse(localStorage.getItem(STORE.progressKey)||'{}'); }catch(_){ return {}; } }
+function saveProgress(game,level){ const p=loadProgress(); p[game]=p[game]||{}; p[game][level]=true; localStorage.setItem(STORE.progressKey, JSON.stringify(p)); }
+
+/* ------------ Fondo de partículas ------------- */
+const bg=document.getElementById('bgParticles'); const g=bg.getContext('2d');
+function resizeBg(){ bg.width=innerWidth; bg.height=innerHeight; } addEventListener('resize',resizeBg); resizeBg();
+const P=Array.from({length:90},()=>({x:Math.random()*bg.width,y:Math.random()*bg.height,vx:(Math.random()-.5)*.6,vy:(Math.random()-.5)*.6,r:1+Math.random()*2,a:.3+.5*Math.random()}));
+(function loop(){ g.clearRect(0,0,bg.width,bg.height); P.forEach(p=>{ p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>bg.width)p.vx*=-1;if(p.y<0||p.y>bg.height)p.vy*=-1; g.globalAlpha=p.a; g.beginPath(); g.arc(p.x,p.y,p.r,0,Math.PI*2); g.fillStyle='#b39dfd'; g.fill(); }); requestAnimationFrame(loop); })();
+
+/* ------------ Navegación ------------- */
+document.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.nav)));
+function show(view){ Object.values(views).forEach(v=>v.classList.remove('show')); views[view].classList.add('show'); startTimer(); }
+document.querySelectorAll('[data-game]').forEach(b=>b.addEventListener('click',()=>{ currentGame=b.dataset.game; buildLevels(); }));
+$('backLevels').onclick=()=>buildLevels();
+
+/* ------------ Menú de juegos / niveles ------------- */
+let currentGame='attrape', currentLevel=1;
+function buildLevels(){
+  show('games');
+  const grid=$('levels'); grid.innerHTML='';
+  const prog=loadProgress();
+  for(let i=1;i<=5;i++){
+    const btn=document.createElement('button'); btn.className='levelbtn'; btn.textContent=`Nivel ${i}`;
+    if(prog[currentGame]?.[i]) btn.classList.add('done');
+    btn.onclick=()=>startLevel(i);
+    grid.appendChild(btn);
+  }
+}
+function startLevel(lvl){
+  currentLevel=lvl; ok=0; ko=0; updateStats();
+  $('gameTitle').innerText=currentGame==='attrape'?'🎯 Attrape le Mot':currentGame==='shaman'?'🪄 Shaman Magic':'🎁 Sorpresa';
+  $('levelTitle').innerText=`Nivel ${lvl}`;
+  if(currentGame==='attrape'){ setupAttrape(); showMode('attrape'); }
+  else if(currentGame==='shaman'){ setupShaman(); showMode('shaman'); }
+  else { setupSurprise(); showMode('surprise'); }
+  show('play');
+}
+function showMode(m){ ['attrape','shaman','surprise'].forEach(x=>$('mode-'+x).style.display=(x===m?'block':'none')); }
+
+/* ------------ Confeti ------------- */
+function confettiBurst(){
+  const c=$('confetti'); const ctx=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight;
+  const parts=Array.from({length:80},()=>({x:c.width/2,y:c.height/2,vx:(Math.random()-.5)*9,vy:(Math.random()-1.2)*8,a:1,r:2+Math.random()*3}));
+  (function step(){ ctx.clearRect(0,0,c.width,c.height); parts.forEach(p=>{ p.x+=p.vx;p.y+=p.vy;p.vy+=.2;p.a-=.02; ctx.globalAlpha=Math.max(p.a,0); ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); }); if(parts.some(p=>p.a>0)) requestAnimationFrame(step); else ctx.clearRect(0,0,c.width,c.height); })();
+}
+
+/* ------------ Juego 1: Attrape le Mot ------------- */
+let attrWords=[], attrIdx=0, attrCurrent=null;
+function poolAttr(lvl){
+  const groups=[['travail','corail','paille','grenouille'],['muraille','nouille','portail','citrouille'],['bataille','ratatouille','écaille','rail'],['médaille','éventail','fenouil','épouvantail'],['corail','citrouille','grenouille','médaille']];
+  const names=groups[Math.max(0,Math.min(4,lvl-1))]; return WORDS.filter(w=>names.includes(w.w));
+}
+function setupAttrape(){ attrWords=shuffle(poolAttr(currentLevel)); attrIdx=0; $('hintAttrape').innerText=''; $('seriesTxt').innerText='Série 1 / 1'; renderAttrape(); }
+function renderAttrape(){
+  const a=attrWords[attrIdx], b=pickConfuser(a); attrCurrent={correct:a,other:b};
+  $('imgA').querySelector('span').innerText=a.e; $('imgA').querySelector('p').innerText=a.w;
+  $('imgB').querySelector('span').innerText=b.e; $('imgB').querySelector('p').innerText=b.w;
+  const opts=shuffle([a.w,b.w]); $('opt1').innerText=opts[0]; $('opt2').innerText=opts[1];
+  ['opt1','opt2'].forEach(id=>$(id).classList.remove('correct','wrong'));
+}
+function pickConfuser(word){ const end=word.w.slice(-4); const c=WORDS.filter(w=>w.w!==word.w&&(w.w.endsWith(end)||w.w.includes(end.slice(-3)))); return (c.length?c:WORDS.filter(w=>w.g!==word.g))[Math.floor(Math.random()*(c.length?c.length:WORDS.length))]; }
+$('opt1').onclick=()=>chooseAttr($('opt1')); $('opt2').onclick=()=>chooseAttr($('opt2')); $('btnHear').onclick=()=>speak(attrCurrent.correct.w); $('btnNext').onclick=()=>nextAttr(); $('btnFinishAttrape').onclick=()=>finishLevel();
+function chooseAttr(btn){
+  const text=btn.innerText;
+  if(text===attrCurrent.correct.w){ ok++; addCoins(1); updateStats(); btn.classList.add('correct'); confettiBurst(); $('hintAttrape').innerText=`✅ ${articleOf(attrCurrent.correct)} ${attrCurrent.correct.w} — ${attrCurrent.correct.rule}`; }
+  else { ko++; updateStats(); btn.classList.add('wrong'); navigator.vibrate?.([20,40,20]); $('hintAttrape').innerText=`❌ No es "${text}". Correcto: ${articleOf(attrCurrent.correct)} ${attrCurrent.correct.w}. Pista: ${attrCurrent.correct.rule}`; }
+}
+function nextAttr(){ if(attrIdx<attrWords.length-1){ attrIdx++; renderAttrape(); } else $('hintAttrape').innerText='🎉 Serie terminada. Puedes "Terminar nivel".'; }
+
+/* ------------ Juego 2: Shaman Magic ------------- */
+let target='m';
+function setupShaman(){ target=(currentLevel%2===1)?'m':'f'; $('goalText').innerText=target==='m'?'Sélectionne uniquement les mots masculins':'Sélectionne uniquement les mots féminins'; $('bar').style.width='0%'; $('hintShaman').innerText=''; renderBoard(); }
+function renderBoard(){
+  const grid=$('grid'); grid.innerHTML=''; shuffle(WORDS).slice(0,15).forEach(w=>{
+    const d=document.createElement('div'); d.className='cell'; d.textContent=w.w;
+    d.onclick=()=>{ if(w.g===target){ d.classList.add('good'); ok++; addCoins(1); updateStats(); confettiBurst(); const good=document.querySelectorAll('.cell.good').length; $('bar').style.width=Math.min(100,good*10)+'%'; $('hintShaman').innerText=`✅ ${articleOf(w)} ${w.w} — ${w.rule}`; }
+      else { d.classList.add('bad'); ko++; updateStats(); $('hintShaman').innerText=`❌ ${w.w} no es del género pedido.`; navigator.vibrate?.([20,40,20]); } };
+    grid.appendChild(d);
+  });
+}
+$('btnFinishShaman').onclick=()=>finishLevel();
+
+/* ------------ Juego 3: Sorpresa ------------- */
+function setupSurprise(){ $('hintSur').innerText=''; }
+$('btnPlayClue').onclick=()=>speak('nouille');
+$('sur1').onclick=()=>{ ok++; addCoins(1); updateStats(); $('hintSur').innerText='✅ ¡Bien! Era nouille.'; confettiBurst(); };
+$('sur2').onclick=()=>{ ko++; updateStats(); $('hintSur').innerText='❌ Esa es grenouille. Pista: -ouille suena parecido.'; navigator.vibrate?.([20,40,20]); };
+$('btnFinishSur').onclick=()=>finishLevel();
+
+/* ------------ Fin de nivel (estrellas + cofre) ------------- */
+$('btnGoLevels').onclick=()=>{ $('finishDlg').close(); buildLevels(); };
+function finishLevel(){
+  const accuracy = ok+ko>0 ? ok/(ok+ko) : 1;
+  const stars = accuracy>=.9?3:accuracy>=.7?2:1;
+  saveProgress(currentGame,currentLevel);
+  const cont=$('stars'); cont.innerHTML=''; for(let i=0;i<3;i++){ const s=document.createElement('div'); s.className='star'+(i<stars?'':' off'); cont.appendChild(s); }
+  const chest=$('chest'); chest.classList.remove('open'); setTimeout(()=>chest.classList.add('open'), 200);
+  const reward=stars*5; addCoins(reward);
+  $('finishMsg').innerText=`Ganas +${reward} 🪙 (exactitud ${(accuracy*100|0)}%)`;
+  $('finishDlg').showModal();
+}
+
+/* ------------ Cuentos mágicos ------------- */
+const storyWords = WORDS.map(w=>w.w);
+function buildStoryList(){
+  const list=$('storyList'); list.innerHTML='';
+  storyWords.forEach(k=>{ const b=document.createElement('button'); b.className='levelbtn'; b.textContent=k; b.onclick=()=>openStory(k); list.appendChild(b); });
+  $('storyBox').style.display='none';
+}
+function typewriter(el, text, speed=20){ el.innerText=''; let i=0; (function next(){ if(i<text.length){ el.innerText+=text[i++]; setTimeout(next, speed); } })(); }
+function openStory(word){
+  $('storyTitle').innerText='📖 '+word;
+  $('storyBox').style.display='block';
+  const wObj = WORDS.find(x=>x.w===word) || {w:word,g:'m'};
+  const art = articleOf(wObj);
+  const template = genStory(word, art);
+  typewriter($('storyText'), template, 16);
+}
+$('btnStoryPlay').onclick=()=>speak($('storyText').innerText);
+$('btnStoryNew').onclick=()=>{ const w=$('storyTitle').innerText.replace('📖 ',''); openStory(w); };
+
+/* ——— Generador de cuento (3–5 min lectura aprox. si se narra lento) ——— */
+function genStory(word, art){
+  const hero = (Math.random()<.5)?'Léna':'Alex';
+  const friend = (Math.random()<.5)?'Noa':'Maya';
+  const place = ['bosque azul','pueblo de las estrellas','castillo de los vientos','isla de corales','biblioteca secreta'][Math.floor(Math.random()*5)];
+  const quest = ['encontrar la puerta correcta','escuchar la canción escondida','resolver el acertijo del puente','ayudar a un amigo perdido','curar al roble antiguo'][Math.floor(Math.random()*5)];
+  const lesson = ['el valor nace del corazón','la alegría se comparte','la sabiduría crece cuando preguntamos','el trabajo en equipo hace magia','la paciencia ilumina el camino'][Math.floor(Math.random()*5)];
+  return (
+`${hero} despertó con un presentimiento: hoy, ${art}${word} iba a cambiar su vida.
+En el ${place}, una luciérnaga dejó un mapa que solo brillaba cuando uno respiraba lento. ${hero} sonrió: “esto huele a aventura”.
+—¿Vienes? —preguntó a ${friend}. Y partieron.
+
+El sendero parecía fácil… hasta que todo se oscureció. Una puerta gigante apareció con tres cerraduras y un acertijo:
+“Para avanzar debes ${quest}”. El viento hizo “shhh” como si guardara un secreto. Hubo un momento de suspenso.
+
+${friend} tuvo miedo, pero ${hero} recordó que el coraje no grita: camina despacito y no se rinde. 
+Buscaron pistas, escucharon con atención y unieron las ideas con inteligencia.
+Entonces, ${art}${word} brilló—como si dijera: “¡confíen en ustedes!”.
+
+La puerta se abrió y entraron en un jardín donde las flores se reían. 
+Había música, colores y un perfume dulce: romance tierno, como cuando un amigo te toma la mano para decir “estoy contigo”.
+En el centro del jardín, una fuente mostró la respuesta: ${lesson}.
+
+Volvieron a casa con alegría. ${friend} dio un salto de felicidad; ${hero} guardó el mapa en el bolsillo.
+Desde ese día, cuando alguien pregunta por ${art}${word}, todos cuentan la historia con una sonrisa:
+la noche tuvo suspenso, el día trajo amor, y el corazón aprendió a ser valiente y sabio.`
+  );
+}
+
+/* ------------ Arranque ------------- */
+function boot(){ show('home'); updateStats(); buildStoryList(); }
+boot();
+</script>
+</body>
+</html>
